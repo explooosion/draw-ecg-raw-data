@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ECG DEMO</title>
+    <script src="./csv.js"></script>
+    <script>
+        console.log(csv);
+        const EcgData = csv.map(({ value }) => {
+            // 放大兩百倍*200 , 校正繪圖Y位置+50
+            return Number(value) * 200 + 50;
+        });
+    </script>
+</head>
+
+<body>
+
+    <canvas id="canvas" width="1024" height="200" style="background-color: black;"></canvas>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        let w = canvas.width,
+            h = canvas.height,
+            speed = 0.2,
+            scanBarWidth = 1,
+            i = 0,
+            data = EcgData,
+            color = '#00ff00';
+        let px = 0;
+        let opx = 0;
+        let py = h / 2;
+        let opy = py;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.setTransform(1, 0, 0, -1, 0, h);
+
+        setInterval(drawWave, 1);
+
+        // drawWave();
+
+        function drawWave() {
+            px += speed;
+            ctx.clearRect(px, 0, scanBarWidth, h);
+            ctx.beginPath();
+            ctx.moveTo(opx, opy);
+            ctx.lineJoin = 'round';
+            py = (data[++i >= data.length ? i = 0 : i++]);
+            ctx.lineTo(px, py);
+            ctx.stroke();
+            opx = px;
+            opy = py;
+            if (opx > w) {
+                px = opx = -speed;
+            }
+
+            // requestAnimationFrame(drawWave);
+        }
+    </script>
+</body>
+
+</html>
